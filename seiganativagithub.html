@@ -1,0 +1,357 @@
+<html>
+
+<head>
+	<meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Siega Nativa</title>
+  <style>
+    #map {
+      height: 100%;
+    }
+    
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    
+    #locationsinput {
+      background-color: #fff;
+      font-family: Roboto;
+      font-size: 15px;
+      font-weight: 300;
+	  border: 1px solid gray;
+      text-overflow: ellipsis;
+      width: 400px;
+	  
+    }
+	
+	
+    
+    
+  </style>
+
+  
+	<input id="pac-input" type="search" placeholder="Enter address" style="width:40%;" >
+  <div id="map"></div>
+
+	<script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBvV0XIVB50c0jUdvXu0d3QUheaFCEwzHo&libraries=places,geometry&callback=initMap">
+  </script>
+  
+  
+</head>
+
+<body>
+  <script>
+	
+
+
+var markers = [];
+var map;
+var infowindow;
+
+var polyData;
+
+function initMap() {
+
+
+$.getJSON( "https://raw.githubusercontent.com/jagadishkpro/filehost/main/SiegaNativaMerged12052022.geojson", function( data ) {
+	//console.log(data)
+  
+ polyData = data;
+ map = new google.maps.Map(document.getElementById('map'), {
+    zoom: 16,
+    center: {lat: 10.191191992720253, lng: -74.67855200292696},
+	mapTypeControl : true,
+
+    fullscreenControl: true,
+    scaleControl: true,
+    streetViewControl: true,
+    zoomControl: true,
+    
+  });
+  
+  
+  
+  
+  google.maps.Polygon.prototype.getBoundingBox = function() {
+            var bounds = new google.maps.LatLngBounds();
+
+            this.getPath().forEach(function(element,index) {
+                bounds.extend(element)
+            });
+
+            return(bounds);
+        };
+  
+  google.maps.Polygon.prototype.getApproximateCenter = function() {
+  var boundsHeight = 0,
+      boundsWidth = 0,
+      centerPoint,
+      heightIncr = 0,
+      maxSearchLoops,
+      maxSearchSteps = 10,
+      n = 1,
+      northWest,
+      polygonBounds = this.getBoundingBox(),
+      testPos,
+      widthIncr = 0;
+
+
+  
+  centerPoint = polygonBounds.getCenter();
+
+
+  if (google.maps.geometry.poly.containsLocation(centerPoint, this)) {
+      
+      return centerPoint;
+  } else {
+      maxSearchLoops = maxSearchSteps / 2;
+
+      northWest = new google.maps.LatLng(
+        polygonBounds.getNorthEast().lat(), 
+        polygonBounds.getSouthWest().lng()
+      );
+
+
+      boundsHeight = google.maps.geometry.spherical.computeDistanceBetween(
+        northWest, 
+        polygonBounds.getSouthWest()
+      );
+      heightIncr = boundsHeight / maxSearchSteps;
+
+
+      boundsWidth = google.maps.geometry.spherical.computeDistanceBetween(
+         northWest, polygonBounds.getNorthEast()
+      );
+      widthIncr = boundsWidth / maxSearchSteps;
+
+
+      for (; n <= maxSearchSteps; n++) {
+         
+          testPos = google.maps.geometry.spherical.computeOffset(
+            centerPoint, 
+            (heightIncr * n), 
+            0
+          );
+          if (google.maps.geometry.poly.containsLocation(testPos, this)) {
+              break;
+          }
+
+
+         
+          testPos = google.maps.geometry.spherical.computeOffset(
+            centerPoint, 
+            (widthIncr * n), 
+            90
+          );
+          if (google.maps.geometry.poly.containsLocation(testPos, this)) {
+              break;
+          }
+
+
+        
+          testPos = google.maps.geometry.spherical.computeOffset(
+            centerPoint, 
+            (heightIncr * n), 
+            180
+          );
+          if (google.maps.geometry.poly.containsLocation(testPos, this)) {
+              break;
+          }
+
+
+      
+          testPos = google.maps.geometry.spherical.computeOffset(
+            centerPoint, 
+            (widthIncr * n), 
+            270
+          );
+          if (google.maps.geometry.poly.containsLocation(testPos, this)) {
+              break;
+          }
+      }
+
+
+      return(testPos);
+  }
+};
+  
+ 
+  
+  infowindow = new google.maps.InfoWindow();
+   map.data.addGeoJson(polyData);
+    map.data.setStyle(function (feature) {
+        var color = "#008000";
+		
+		if(feature.getProperty("Status") == "Available"){
+			return {
+				fillColor: "#FFFFFF",
+				strokeWeight: 1,
+				strokeColor: "#556635"
+			};
+		}else{
+		
+			return {
+				fillColor: "#556635",
+				strokeWeight: 1,
+				strokeColor: "#556635",
+				fillOpacity: 0.2
+			};
+		
+		}
+        
+		
+    });
+	var bounds = new google.maps.LatLngBounds();
+	map.data.forEach(function(feature) {
+	
+		if(feature.getProperty("ProfilePic") != null){
+			
+		  var tempFeature = feature;
+		  
+			
+    
+        
+            feature.getGeometry().forEachLatLng(function (latlng) {
+                bounds.extend(latlng);
+            }); 
+			
+			
+        tempPoly = new google.maps.Polygon({
+			
+			paths: feature.getGeometry().getAt(0).getAt(0).getArray(),
+			strokeColor: "#FF0000",
+			strokeOpacity: 0.8,
+			strokeWeight: 2,
+			fillColor: "#FF0000",
+			fillOpacity: 0.35,
+		  });
+		  
+		
+		  
+		
+		
+		const image = {
+		
+		url:  tempFeature.getProperty("ProfilePic"),
+		scaledSize: new google.maps.Size(50, 50), 
+		
+		
+		anchor: new google.maps.Point(25, 25),
+	  };
+		  var picMarker = new google.maps.Marker({
+			
+			position: tempPoly.getApproximateCenter(),
+			map,
+			icon: image,
+			
+			visible: false
+		  });
+		  
+		  markers.push(picMarker);
+		  picMarker.addListener("click", () => {
+				var contentString = "<h3>"+  tempFeature.getProperty("Member") + "</h3>"
+								+ "<img src='" + tempFeature.getProperty("ProfilePic") + "' width='60' height='60'><br>" 
+								+ "<br><b>Nationality: </b>"+ tempFeature.getProperty("Nationalit")
+								+ "<br><b>Location: </b>"+ tempFeature.getProperty("Location")
+								+ "<br><b>Name of the plot: </b>"+ tempFeature.getProperty("Plot Name")
+								+ "<br><b>Year: </b>"+ tempFeature.getProperty("Year Plant")
+								+ "<br><b>Plot Area(sqm): </b>"+ parseFloat(tempFeature.getProperty("Area (sqm)")).toFixed(1)
+								+ "<br><b>Member since: </b>"+ tempFeature.getProperty("Since")
+								+ "<br><b>Seiga Native ID: </b>"+ tempFeature.getProperty("Siega Id");
+								
+				infowindow.setContent(contentString);
+				map.panTo(picMarker.getPosition());
+				map.setZoom(20);
+				infowindow.open({
+				  anchor: picMarker,
+				  map,
+				  shouldFocus: false,
+				});
+
+				
+			
+			});
+		
+		}
+		  
+    });
+	
+	map.data.addListener('click', function(event) {
+     var feat = event.feature;
+	 var contentStringPoly = "<h4>"+ feat.getProperty("Siega_Id") + "</h4><b>Poly ID: </b>" + feat.getProperty("POLY_ID") 
+								+ "<br><b>Plot Name: </b>"+ feat.getProperty("Plot_Name")
+								+ "<br><b>Status: </b>"+ feat.getProperty("Status")
+								+ "<br><b>Year: </b>"+ feat.getProperty("Year_Plant");
+				//infowindow.setContent(contentStringPoly);
+				map.panTo(event.latLng);
+				//map.setZoom(20);
+				/*infowindow.setPosition(event.latLng);
+				infowindow.open({
+				  //anchor: picMarker,
+				  map,
+				  shouldFocus: false,
+				}); */
+				
+			
+	 
+	 });
+	
+	map.fitBounds(bounds);
+	google.maps.event.addListener(map, 'zoom_changed', function() {
+		var zoom = map.getZoom();
+	   
+		for (i = 0; i < markers.length; i++) {
+			markers[i].setVisible(zoom >= 18);
+		}
+	});
+  
+  
+  
+  var searchBox = new google.maps.places.SearchBox(document.getElementById('pac-input'));
+		document.getElementById('pac-input').style.display = "block";
+		map.controls[google.maps.ControlPosition.TOP_CENTER].push(document.getElementById('pac-input'));
+		google.maps.event.addListener(searchBox, 'places_changed', function() {
+		searchBox.set('map', null);
+
+
+		 var places = searchBox.getPlaces();
+			
+		 var bounds = new google.maps.LatLngBounds();
+		 var i, place;
+		 for (i = 0; place = places[i]; i++) {
+		   (function(place) {
+			 
+			 bounds.extend(place.geometry.location);
+
+
+		   }(place));
+
+		 }
+		 map.fitBounds(bounds);
+		 searchBox.set('map', map);
+		 map.setZoom(Math.min(map.getZoom(),9));			//This controls the zoom level of the map after searching for an address
+		 
+
+	   });  
+  
+});
+  
+};
+
+
+
+
+  
+  </script>
+  
+  
+  
+</body>
+
+</html>
