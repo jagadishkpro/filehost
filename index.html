@@ -1,0 +1,212 @@
+<html>
+
+<head>
+	<meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gas station finder</title>
+  <style>
+    #map {
+      height: 100%;
+    }
+    
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    
+    #locationsinput {
+      background-color: #fff;
+      font-family: Roboto;
+      font-size: 15px;
+      font-weight: 300;
+	  border: 1px solid gray;
+      text-overflow: ellipsis;
+      width: 400px;
+	  
+    }
+	
+	
+    
+    
+  </style>
+  <!-- The div to hold the map -->
+  
+	<input id="pac-input" type="search" placeholder="Enter address" style="width:40%;" >
+  <div id="map" style="width: 50%; height: 100%; float: left"></div>
+    <div id="pano" style="width: 50%; height: 100%; float: left"></div>
+  
+	<script src="https://unpkg.com/@googlemaps/markerclustererplus/dist/index.min.js"></script>
+	<script src="tdxlinxdatabase.js"></script>
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBvV0XIVB50c0jUdvXu0d3QUheaFCEwzHo&libraries=places&callback=initMap">
+  </script>
+  
+  
+</head>
+
+<body>
+  <script>
+	
+
+
+var markers = [];
+var map;
+var infowindow;
+var notEligiblemarkers = [];
+var sv;
+
+function initMap() {
+  // Create the map.
+  map = new google.maps.Map(document.getElementById('map'), {
+    zoom: 4,
+    center: {lat: 39.8283, lng: -98.5795},
+	mapTypeControl : true,
+	mapTypeId: google.maps.MapTypeId.SATELLITE,
+    fullscreenControl: true,
+    scaleControl: true,
+    streetViewControl: false,
+    zoomControl: true,
+    
+  });
+  
+  sv = new google.maps.StreetViewService();
+        panorama = new google.maps.StreetViewPanorama(
+          document.getElementById("pano")
+        );
+  
+  infowindow = new google.maps.InfoWindow();
+  
+  markers = data.map((location) => locationToMarkers(location, map, infowindow));
+
+ /*  new MarkerClusterer(map, notEligiblemarkers, {
+    imagePath:
+      "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
+  }); */
+  
+  
+  var searchBox = new google.maps.places.SearchBox(document.getElementById('pac-input'));
+		document.getElementById('pac-input').style.display = "block";
+		map.controls[google.maps.ControlPosition.TOP_CENTER].push(document.getElementById('pac-input'));
+		google.maps.event.addListener(searchBox, 'places_changed', function() {
+		searchBox.set('map', null);
+
+
+		 var places = searchBox.getPlaces();
+			
+		 var bounds = new google.maps.LatLngBounds();
+		 var i, place;
+		 for (i = 0; place = places[i]; i++) {
+		   (function(place) {
+			 
+			 bounds.extend(place.geometry.location);
+
+
+		   }(place));
+
+		 }
+		 map.fitBounds(bounds);
+		 searchBox.set('map', map);
+		 map.setZoom(Math.min(map.getZoom(),9));			//This controls the zoom level of the map after searching for an address
+		 
+
+	   });  
+  
+}
+
+const locationToMarkers = (location, map, infowindow) => {
+	
+  
+
+  const [lat, lng] = [location.SLAT , location.SLONG] ;
+  
+  if(location.STATUS == "Eligible"){
+	
+	var marker = new google.maps.Marker({
+			  
+			  position: { lat, lng },
+			  map: map,
+			  icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
+			  
+			  /*{
+				//size: new google.maps.Size(27, 43),
+			    origin: new google.maps.Point(0, 0),
+			    //anchor: new google.maps.Point(16, 16),
+                url: 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent ('<svg enable-background="new 0 0 65 65" height="40px" id="Layer_1" version="1.1" viewBox="0 0 65 65" width="40px" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">'
++ '<path fill="#008000" d="M47.985,11.387c-2.508-6.346-7.831-9.938-15.396-10.389c-0.027-0.001-0.052,0.003-0.079,0.003  c-0.033,0-0.066-0.006-0.1-0.004C24.847,1.447,19.523,5.04,17.016,11.385c-6.059,15.333,5.718,43,14.396,52.153  c0.013,0.014,0.028,0.022,0.041,0.035c0.006,0.006,0.008,0.016,0.015,0.021c0.012,0.011,0.027,0.015,0.039,0.024  c0.133,0.118,0.278,0.214,0.436,0.277c0.014,0.005,0.028,0.008,0.042,0.013c0.166,0.061,0.339,0.097,0.514,0.097c0,0,0,0,0.001,0h0  h0c0,0,0,0,0.001,0c0.175,0,0.348-0.036,0.514-0.097c0.014-0.005,0.028-0.008,0.042-0.013c0.158-0.063,0.305-0.159,0.438-0.278  c0.011-0.01,0.026-0.013,0.037-0.023c0.007-0.006,0.008-0.015,0.015-0.021c0.014-0.014,0.029-0.022,0.042-0.036  C42.267,54.386,54.043,26.72,47.985,11.387z M32.5,29.135c-6.025,0-10.926-4.901-10.926-10.926c0-6.024,4.901-10.926,10.926-10.926  c6.025,0,10.927,4.901,10.927,10.926C43.427,24.233,38.525,29.135,32.5,29.135z"/>'
++ '<path fill="#008000" d="M32.5,10.283c-4.371,0-7.926,3.556-7.926,7.926c0,4.371,3.556,7.926,7.926,7.926c4.371,0,7.927-3.556,7.927-7.926  C40.427,13.838,36.871,10.283,32.5,10.283z"/></svg>')
+            }  */
+		   });
+		var pano = null;
+  marker.addListener("click", () => {
+    infowindow.setContent(
+        "<b>" + location.FULLADD + ", <br/>" + location.SZIP + " </b> <br/> Store: " + location.SNAME + "<br/> Phone: " + location.SPHONENO + "<br/> Lot Area(SF): " + location.LAREASF + "<br/> Building Area(SF): " + location.BUILDAREASF + '<br/><br/> <a target="_blank" href="https://www.google.com/maps/search/?api=1&query=' + lat + "," + lng + '">OPEN IN GOOGLE MAPS</a>'
+    );
+    infowindow.setPosition({ lat, lng });
+    
+    infowindow.open(map, marker);
+	map.panTo(marker.getPosition());
+	map.setZoom(20);
+	
+	sv.getPanorama({ location: marker.getPosition(), radius: 50 }, processSVData);
+  });
+  
+  console.log(marker)
+ 
+  return marker;
+  
+  }
+  /*else{
+	var marker = new google.maps.Marker({
+			  
+			  position: { lat, lng },
+			  map: map,
+			  
+		   });
+		
+  marker.addListener("click", () => {
+    infowindow.setContent(
+        "<b>" + location.FULLADD + ", <br/>" + location.SZIP + " </b> <br/> Store: " + location.SNAME + "<br/> Phone: " + location.SPHONENO + '<br/><br/> <a target="_blank" href="https://www.google.com/maps/search/?api=1&query=' + lat + "," + lng + '">OPEN IN GOOGLE MAPS</a>'
+    );
+    infowindow.setPosition({ lat, lng });
+    
+    infowindow.open(map, marker);
+	map.panTo(marker.getPosition());
+  });
+  
+  notEligiblemarkers.push(marker);
+ 
+  return marker;
+  } */
+  
+  
+};
+
+function processSVData(data, status) {
+        if (status === "OK") {
+          const location = data.location;
+          
+          panorama.setPano(location.pano);
+          panorama.setPov({
+            heading: 270,
+            pitch: 0,
+          });
+          panorama.setVisible(true);
+          
+        } else {
+          console.error("Street View data not found for this location.");
+        }
+      }
+
+
+
+
+  
+  </script>
+  
+  
+  
+</body>
+
+</html>
