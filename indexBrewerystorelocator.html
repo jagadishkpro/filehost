@@ -1,0 +1,882 @@
+<html>
+
+<head>
+  <title>Store Locator</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  
+  <!-- BootStrap CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <!-- JQuery -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <!-- Popper --> 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <!-- BootStrap JS -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script> 
+  
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+  <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+  <style>
+    #map {
+      height: 95%;
+    }
+    
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+ 
+    
+  
+
+   
+    
+    
+    
+    
+	
+	.topnav {
+ 
+  background-color: #49669c;
+  text-align: center;
+  padding: 5px;
+}
+
+
+
+
+.topnav .icon {
+  display: none;
+}
+
+.topnav .empty{
+	display:none;
+	
+}
+
+.ui-autocomplete {
+            max-height: 200px;
+            overflow-y: auto;
+            /* prevent horizontal scrollbar */
+            overflow-x: hidden;
+            /* add padding to account for vertical scrollbar */
+            padding-right: 20px;
+        } 
+
+.dropdown .dropdown-menu {
+		
+    border-radius: 0;
+    max-height: 295px;
+   
+    width: 100%;
+    left: 0;
+    overflow-y: auto;
+    margin-top: 0;
+    padding-top: 0;
+}
+
+#wrapper { position: relative; }
+   
+
+.sidebar {
+      
+    border: 5px solid #1f4f65;
+    border-width: 5px 0;
+    position: absolute;
+    top: 20px;
+    right: 0;
+    z-index: 10;
+    width: 425px;
+    height: calc(100% - 70px);
+    overflow-y: scroll;
+    overflow-x: hidden;
+    z-index: 1;
+    background-color: rgba(0,0,0,.1);
+    perspective: 1300px;
+    transition: transform .3s ease-in-out;
+    transform: none!important;
+    display: none;
+
+    }
+
+    
+
+
+    .heading {
+      background: #fff;
+      border-bottom: 1px solid #eee;
+      height: auto;
+      /*      line-height:60px;*/
+      padding: 10px;
+    }
+
+    #listingDiv {
+      overflow: auto;
+      float: left;
+    }
+
+    .listings {
+      height: 100%;
+	  width: 100%;
+      overflow: auto;
+      padding-bottom: 60px;
+    }
+
+    .listings .item {
+      display: block;
+      border-bottom: 1px solid #eee;
+      padding: 15px;
+      text-decoration: none;
+	  overflow: auto;
+	  background-color: white;
+    }
+
+    .listings .item:last-child {
+      border-bottom: none;
+    }
+
+    .listings .item .title {
+      display: block;
+      /*      color:#00853e;*/
+      color: #000;
+      font-weight: 700;
+    }
+
+    .listings .item .title small {
+      font-weight: 400;
+    }
+
+    .listings .item.active .title,
+    .listings .item .title:hover {
+      color: #b74042;
+    }
+    /*#8cc63f*/
+
+    .listings .item.active {
+      background-color: white;
+    }
+
+
+
+
+.company-type.beer-bar {
+    background: #000;
+    color: #fff;
+}
+
+.company-type.brewpub {
+    background-color: #ffc300;
+    color: #222;
+}
+
+
+
+.company-type {
+    position: relative;
+    
+    padding: 5px 10px 3px 10px;
+    font-size: 12px;
+    color: #fff;
+	width: 50%;
+    text-transform: uppercase;
+    background-color: #abd2e3;
+}
+
+.item-location {
+    max-width: 65%;
+    margin-bottom: 10px;
+    margin-top: 10px;
+	float: left;
+}
+
+.item-ownership-image {
+    
+    display: block;
+    
+    padding-bottom: 3px;
+	float: right;
+}
+
+.is-craft {
+    display: block;
+    position: relative;
+    bottom: 10px;
+    right: 5px;
+	
+}
+
+.craft-seal {
+    width: 62px;
+	display: block;
+    position: relative;
+    bottom: 10px;
+    right: 5px;
+}
+
+
+
+.btn-wrapper-websitedirections {
+    display: flex;
+    margin-top: 5px;
+}
+
+.btn-wrapper-websitedirections a:first-of-type {
+    margin-right: 10px;
+}
+
+
+
+
+
+
+     ::-webkit-scrollbar {
+      width: 3px;
+      height: 3px;
+      border-left: 0;
+      background: rgba(0, 0, 0, 0.1);
+    }
+
+     ::-webkit-scrollbar-track {
+      background: none;
+    }
+
+     ::-webkit-scrollbar-thumb {
+      background: #00853e;
+      border-radius: 0;
+    }
+
+
+  </style>
+</head>
+
+<body>
+
+<div class="topnav" id="myTopnav">
+<a href="" id="empty" class="empty"></a>
+<div class="btn-group">
+<div class="dropdown">
+  <button class="btn btn-primary dropdown-toggle" type="button" id="state-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Locations
+  </button>
+<div class="dropdown-menu" aria-labelledby="state-toggle" id="state-select">
+	            		<a class="dropdown-item" data-state-id="AL" href="#AL">Alabama</a>
+	            		<a class="dropdown-item" data-state-id="AK" href="#AK">Alaska</a>
+	            		<a class="dropdown-item" data-state-id="AZ" href="#AZ">Arizona</a>
+	            		<a class="dropdown-item" data-state-id="AR" href="#AR">Arkansas</a>
+	            		<a class="dropdown-item" data-state-id="CA" href="#CA">California</a>
+	            		<a class="dropdown-item" data-state-id="CO" href="#CO">Colorado</a>
+	            		<a class="dropdown-item" data-state-id="CT" href="#CT">Connecticut</a>
+	            		<a class="dropdown-item" data-state-id="DE" href="#DE">Delaware</a>
+	            		<a class="dropdown-item" data-state-id="FL" href="#FL">Florida</a>
+	            		<a class="dropdown-item" data-state-id="GA" href="#GA">Georgia</a>
+	            		<a class="dropdown-item" data-state-id="HI" href="#HI">Hawaii</a>
+	            		<a class="dropdown-item" data-state-id="ID" href="#ID">Idaho</a>
+	            		<a class="dropdown-item" data-state-id="IL" href="#IL">Illinois</a>
+	            		<a class="dropdown-item" data-state-id="IN" href="#IN">Indiana</a>
+	            		<a class="dropdown-item" data-state-id="IA" href="#IA">Iowa</a>
+	            		<a class="dropdown-item" data-state-id="KS" href="#KS">Kansas</a>
+	            		<a class="dropdown-item" data-state-id="KY" href="#KY">Kentucky</a>
+	            		<a class="dropdown-item" data-state-id="LA" href="#LA">Louisiana</a>
+	            		<a class="dropdown-item" data-state-id="ME" href="#ME">Maine</a>
+	            		<a class="dropdown-item" data-state-id="MD" href="#MD">Maryland</a>
+	            		<a class="dropdown-item" data-state-id="MA" href="#MA">Massachusetts</a>
+	            		<a class="dropdown-item" data-state-id="MI" href="#MI">Michigan</a>
+	            		<a class="dropdown-item" data-state-id="MN" href="#MN">Minnesota</a>
+	            		<a class="dropdown-item" data-state-id="MS" href="#MS">Mississippi</a>
+	            		<a class="dropdown-item" data-state-id="MO" href="#MO">Missouri</a>
+	            		<a class="dropdown-item" data-state-id="MT" href="#MT">Montana</a>
+	            		<a class="dropdown-item" data-state-id="NE" href="#NE">Nebraska</a>
+	            		<a class="dropdown-item" data-state-id="NV" href="#NV">Nevada</a>
+	            		<a class="dropdown-item" data-state-id="NH" href="#NH">New Hampshire</a>
+	            		<a class="dropdown-item" data-state-id="NJ" href="#NJ">New Jersey</a>
+	            		<a class="dropdown-item" data-state-id="NM" href="#NM">New Mexico</a>
+	            		<a class="dropdown-item" data-state-id="NY" href="#NY">New York</a>
+	            		<a class="dropdown-item" data-state-id="NC" href="#NC">North Carolina</a>
+	            		<a class="dropdown-item" data-state-id="ND" href="#ND">North Dakota</a>
+	            		<a class="dropdown-item" data-state-id="OH" href="#OH">Ohio</a>
+	            		<a class="dropdown-item" data-state-id="OK" href="#OK">Oklahoma</a>
+	            		<a class="dropdown-item" data-state-id="OR" href="#OR">Oregon</a>
+	            		<a class="dropdown-item" data-state-id="PA" href="#PA">Pennsylvania</a>
+	            		<a class="dropdown-item" data-state-id="RI" href="#RI">Rhode Island</a>
+	            		<a class="dropdown-item" data-state-id="SC" href="#SC">South Carolina</a>
+	            		<a class="dropdown-item" data-state-id="SD" href="#SD">South Dakota</a>
+	            		<a class="dropdown-item" data-state-id="TN" href="#TN">Tennessee</a>
+	            		<a class="dropdown-item" data-state-id="TX" href="#TX">Texas</a>
+	            		<a class="dropdown-item" data-state-id="UT" href="#UT">Utah</a>
+	            		<a class="dropdown-item" data-state-id="VT" href="#VT">Vermont</a>
+	            		<a class="dropdown-item" data-state-id="VA" href="#VA">Virginia</a>
+	            		<a class="dropdown-item" data-state-id="WA" href="#WA">Washington</a>
+	            		<a class="dropdown-item" data-state-id="DC" href="#DC">Washington D.C.</a>
+	            		<a class="dropdown-item" data-state-id="WV" href="#WV">West Virginia</a>
+	            		<a class="dropdown-item" data-state-id="WI" href="#WI">Wisconsin</a>
+	            		<a class="dropdown-item" data-state-id="WY" href="#WY">Wyoming</a>
+	            	</div>
+			</div>
+  </div>
+  <button class="btn btn-primary btn-location" onclick="getLocation()"><i class="fa fa-map-marker"></i> Near Me</button>
+  
+  <div class="ui-widget" style="display:inline-block;">
+  
+  <input id="tags" placeholder="Search Name"><i class="fa fa-search btn"></i>
+	</div>
+ 
+  <a href="javascript:void(0);" class="icon" onclick="openCloseNav()">
+    <i class="fa fa-bars"></i>
+  </a>
+</div>
+  <!-- The div to hold the map -->
+  <div id="wrapper">
+  <div id="map"></div>
+  
+  <div class='sidebar' id="sidebar">
+      
+      
+      <div id='listingDiv' class='listings'></div>
+	  <div id="hide-cards"></div>
+	  <div id="show-list">Show Full List</div>
+    </div>
+	</div>
+  <script src="https://3sdclub.github.io/maps/USAstatecoords.js"></script>
+<script src="https://3sdclub.github.io/maps/AllBreweryLocationsfinal.js"></script>
+
+
+<script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/js-marker-clusterer/1.0.0/markerclusterer_compiled.js?ver=1.1' id='markerCluster-js'></script>
+  
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBxm6ksMQVLbxO43FPMsK5llPtmIUGDv3E&callback=initMap">
+  </script>
+  
+  <script>
+  
+var markers = [];
+var map;
+var infowindow;
+var selectedmarker;
+var listings = document.getElementById('listingDiv'); ;
+var greenPinIcon = "https://static.wixstatic.com/shapes/951b28_c1b32747b45549c1bbb5355d8388daa1.svg";
+var redPinIcon = "https://static.wixstatic.com/media/951b28_76ec1d1530ea4de390d983d757de7414~mv2.png";
+var beerBottleImage = "https://static.wixstatic.com/media/951b28_9c885d844c5648b8aa02eccb1bf3c6a6~mv2.png";
+var smallIcon = "https://static.wixstatic.com/media/951b28_f3b4721a11904648821194819cbfff42~mv2.png";
+var mediumIcon = "https://static.wixstatic.com/media/951b28_26ae3f0d748d406db56d0e9a80fa6375~mv2.png";
+var largeIcon = "https://static.wixstatic.com/media/951b28_cea21e09e5c142b2962e33fabe4b1de7~mv2.png";
+
+function openCloseNav() {
+    var x = document.getElementById("myTopnav");
+    if (x.className === "topnav") {
+        x.className += " responsive";
+    } else {
+        x.className = "topnav";
+    }
+
+}
+var availableBreweries = [];
+
+$('.dropdown-menu a').on('click', function (selectedState) {
+    var selecedStateCode = selectedState.target.dataset.stateId;
+    selectedStateCenter(selecedStateCode);
+    
+});
+
+function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+         
+			 // var nearMeLat = 32.816729495696634;
+  
+              //var nearMeLng = -83.47492781142806;
+			  var nearMeLat = parseFloat(position.coords.latitude);
+            var nearMeLng = parseFloat(position.coords.longitude);
+
+            setMapCenterNearMe({
+                lat: nearMeLat,
+                lng: nearMeLng
+            })
+			
+        },
+            function (error) {
+            if (error.code == error.PERMISSION_DENIED)
+                alert("you denied me :-(");
+        });
+    } else {
+        console.log("Geolocation is not supported by this browser.");
+    }
+}
+
+function setMapCenterNearMe(latlngNearMe) {
+    map.setCenter(latlngNearMe)
+	map.setZoom(10)
+    $('#listingDiv').children().remove();
+    document.getElementById("sidebar").style.display = "block";
+   markers.map((markerNearMe) => { 
+        var markPosNearMe = markerNearMe.getPosition();
+        var markLatLngNearMe = [markPosNearMe.lat(), markPosNearMe.lng()];
+        if (map.getBounds().contains(markPosNearMe)) {
+				
+                
+                    var listing = listings.appendChild(document.createElement('div'));
+                    listing.className = 'item';
+
+                    if (markerNearMe["type"] != 'null') {
+                        var companyType = listing.appendChild(document.createElement('div'));
+                        if (markerNearMe["type"] == "Brewpub") {
+                            companyType.className = "company-type brewpub";
+                        } else {
+                            companyType.className = "company-type beer-bar";
+                        }
+                        companyType.innerHTML = markerNearMe["type"];
+
+                    }
+
+                    var link = listing.appendChild(document.createElement('a'));
+                    link.href = '#';
+                    link.className = 'title';
+                    link.innerHTML = '<br/>' + markerNearMe["name"] + '<br>';
+
+                    var addressTextSearch = markerNearMe["address"];
+
+                    var itemLocationAddress = listing.appendChild(document.createElement('div'));
+                    itemLocationAddress.className = "item-location";
+                    itemLocationAddress.innerHTML += '<small class="quiet">' + addressTextSearch + '</small><br/>';
+
+                    websiteDirectionBtns = document.createElement('div');
+                    websiteDirectionBtns.className = "btn-wrapper-websitedirections";
+                    if (markerNearMe["website"] != "null") {
+                        var websiteBtn = websiteDirectionBtns.appendChild(document.createElement('a'));
+                        websiteBtn.href = "https://" + markerNearMe["website"];
+                        websiteBtn.target = "_blank";
+                        websiteBtn.innerHTML = '<button type="button" class="btn btn-outline-info">Website</button>';
+                    }
+                    var getDirectionsBtn = websiteDirectionBtns.appendChild(document.createElement('a'));
+                    getDirectionsBtn.href = "https://www.google.com/maps?saddr='" + addressTextSearch + "'";
+                    getDirectionsBtn.target = "_blank";
+                    getDirectionsBtn.innerHTML = '<button type="button" class="btn btn-outline-info">Directions</button>';
+
+                    itemLocationAddress.appendChild(websiteDirectionBtns);
+
+                    var ownershipDiv = listing.appendChild(document.createElement('div'));
+                    ownershipDiv.className = "item-ownership-image";
+                    ownershipImage = document.createElement('a');
+                    ownershipImage.href = "https://www.3sd.club/chapters";
+					ownershipImage.target = "_blank";
+                    ownershipImage.className = 'is-craft';
+                    ownershipImage.innerHTML = '<img class="craft-seal" src="'+ beerBottleImage + '" alt="independent craft seal">'
+                        
+                        ownershipDiv.appendChild(ownershipImage)
+
+                        var linkClick = 0;
+
+                    link.onclick = function () {
+                        linkClick = 1;
+                        setActive(listing);
+                        
+                        if (selectedmarker) {
+                            selectedmarker.setIcon(greenPinIcon);
+                        }
+                        
+                                selectedmarker = markerNearMe;
+                                markerNearMe.setIcon(redPinIcon)
+                                map.panTo(markPosNearMe);
+                                map.setZoom(18)
+                         
+
+                        return false;
+                    };
+               
+
+        }
+
+    });
+}
+function searchBreweryCenter(selectedBrewery) {
+	$('#listingDiv').children().remove();
+	document.getElementById("sidebar").style.display = "block";
+    storeJson.map((store) => { 
+		var searchedStore = store;
+        if (searchedStore.Name == selectedBrewery) {
+
+            
+            
+            var listing = listings.appendChild(document.createElement('div'));
+            listing.className = 'item';
+
+            if (searchedStore["Brewery Type"] != 'null') {
+                var companyType = listing.appendChild(document.createElement('div'));
+                if (searchedStore["Brewery Type"] == "Brewpub") {
+                    companyType.className = "company-type brewpub";
+                } else {
+                    companyType.className = "company-type beer-bar";
+                }
+                companyType.innerHTML = searchedStore["Brewery Type"];
+
+            }
+
+            var link = listing.appendChild(document.createElement('a'));
+            link.href = '#';
+            link.className = 'title';
+            link.innerHTML = '<br/>' + searchedStore["Name"] + '<br>';
+			
+			var addressTextSearch = searchedStore["Address"] + ", " + searchedStore["State"] + ", " + searchedStore["Zip Code"] + ", " + searchedStore["Country"];
+			
+            var itemLocationAddress = listing.appendChild(document.createElement('div'));
+            itemLocationAddress.className = "item-location";
+            itemLocationAddress.innerHTML += '<small class="quiet">' + addressTextSearch + '</small><br/>';
+
+            websiteDirectionBtns = document.createElement('div');
+            websiteDirectionBtns.className = "btn-wrapper-websitedirections";
+            if (searchedStore["Website"] != "null") {
+                var websiteBtn = websiteDirectionBtns.appendChild(document.createElement('a'));
+                websiteBtn.href = "https://" + searchedStore["Website"];
+                websiteBtn.target = "_blank";
+                websiteBtn.innerHTML = '<button type="button" class="btn btn-outline-info">Website</button>';
+            }
+            var getDirectionsBtn = websiteDirectionBtns.appendChild(document.createElement('a'));
+            getDirectionsBtn.href = "https://www.google.com/maps?saddr='" + addressTextSearch + "'";
+            getDirectionsBtn.target = "_blank";
+            getDirectionsBtn.innerHTML = '<button type="button" class="btn btn-outline-info">Directions</button>';
+
+            itemLocationAddress.appendChild(websiteDirectionBtns);
+
+            var ownershipDiv = listing.appendChild(document.createElement('div'));
+            ownershipDiv.className = "item-ownership-image";
+            ownershipImage = document.createElement('a');
+			ownershipImage.href = "https://www.3sd.club/chapters";
+			ownershipImage.target = "_blank";
+            ownershipImage.className = 'is-craft';
+            ownershipImage.innerHTML = '<img class="craft-seal" src="'+ beerBottleImage + '" alt="independent craft seal">'
+               
+                ownershipDiv.appendChild(ownershipImage)
+
+                var linkClick = 0;
+
+            link.onclick = function () {
+                linkClick = 1;
+                setActive(listing);
+				var searchLatLng = [searchedStore["Latitude"], searchedStore["Longitude"]];
+				var searchLatLngStr = searchLatLng.toString();
+                if (selectedmarker) {
+                    selectedmarker.setIcon(greenPinIcon);
+                }
+				for(var i=0; i < markers.length; i++){
+					var markPos = markers[i].getPosition();
+					var markLatLng = [markPos.lat(), markPos.lng()];
+					if(markLatLng.toString() == searchLatLngStr){
+						selectedmarker = markers[i];
+						markers[i].setIcon(redPinIcon)
+						map.panTo(markPos);
+						map.setZoom(18)
+					}
+					
+				
+				}
+                
+
+                return false;
+            };
+        }
+
+    });
+
+}
+
+function selectedStateCenter(selStateCode) {
+
+    for (var i = 0; i < usaStates.length; i++) {
+
+        if (usaStates[i]["State Code"] == selStateCode) {
+            selStateLatLng = {
+                lat: usaStates[i]["Latitude"],
+                lng: usaStates[i]["Longitude"]
+            }
+            map.setCenter(selStateLatLng);
+            map.setZoom(6)
+
+        }
+
+    }
+	
+	$('#listingDiv').children().remove();
+	document.getElementById("sidebar").style.display = "block";
+    storeJson.map((store) => { 
+		var searchedStore = store;
+        if (searchedStore["State Code"] == selStateCode) {
+
+            
+            
+            var listing = listings.appendChild(document.createElement('div'));
+            listing.className = 'item';
+
+            if (searchedStore["Brewery Type"] != 'null') {
+                var companyType = listing.appendChild(document.createElement('div'));
+                if (searchedStore["Brewery Type"] == "Brewpub") {
+                    companyType.className = "company-type brewpub";
+                } else {
+                    companyType.className = "company-type beer-bar";
+                }
+                companyType.innerHTML = searchedStore["Brewery Type"];
+
+            }
+
+            var link = listing.appendChild(document.createElement('a'));
+            link.href = '#';
+            link.className = 'title';
+            link.innerHTML = '<br/>' + searchedStore["Name"] + '<br>';
+			
+			var addressTextSearch = searchedStore["Address"] + ", " + searchedStore["State"] + ", " + searchedStore["Zip Code"] + ", " + searchedStore["Country"];
+			
+            var itemLocationAddress = listing.appendChild(document.createElement('div'));
+            itemLocationAddress.className = "item-location";
+            itemLocationAddress.innerHTML += '<small class="quiet">' + addressTextSearch + '</small><br/>';
+
+            websiteDirectionBtns = document.createElement('div');
+            websiteDirectionBtns.className = "btn-wrapper-websitedirections";
+            if (searchedStore["Website"] != "null") {
+                var websiteBtn = websiteDirectionBtns.appendChild(document.createElement('a'));
+                websiteBtn.href = "https://" + searchedStore["Website"];
+                websiteBtn.target = "_blank";
+                websiteBtn.innerHTML = '<button type="button" class="btn btn-outline-info">Website</button>';
+            }
+            var getDirectionsBtn = websiteDirectionBtns.appendChild(document.createElement('a'));
+            getDirectionsBtn.href = "https://www.google.com/maps?saddr='" + addressTextSearch + "'";
+            getDirectionsBtn.target = "_blank";
+            getDirectionsBtn.innerHTML = '<button type="button" class="btn btn-outline-info">Directions</button>';
+
+            itemLocationAddress.appendChild(websiteDirectionBtns);
+
+            var ownershipDiv = listing.appendChild(document.createElement('div'));
+            ownershipDiv.className = "item-ownership-image";
+            ownershipImage = document.createElement('a');
+			ownershipImage.href = "https://www.3sd.club/chapters";
+			ownershipImage.target = "_blank";
+            ownershipImage.className = 'is-craft';
+            ownershipImage.innerHTML = '<img class="craft-seal" src="'+ beerBottleImage + '" alt="independent craft seal">'
+                
+                ownershipDiv.appendChild(ownershipImage)
+
+                var linkClick = 0;
+
+            link.onclick = function () {
+                linkClick = 1;
+                setActive(listing);
+				var searchLatLng = [searchedStore["Latitude"], searchedStore["Longitude"]];
+				var searchLatLngStr = searchLatLng.toString();
+                if (selectedmarker) {
+                    selectedmarker.setIcon(greenPinIcon);
+                }
+				for(var i=0; i < markers.length; i++){
+					var markPos = markers[i].getPosition();
+					var markLatLng = [markPos.lat(), markPos.lng()];
+					if(markLatLng.toString() == searchLatLngStr){
+						selectedmarker = markers[i];
+						markers[i].setIcon(redPinIcon)
+						map.panTo(markPos);
+						map.setZoom(18)
+					}
+					
+				
+				}
+                
+
+                return false;
+            };
+        }
+
+    });
+
+}
+
+function setActive(el) {
+    var siblings = listings.getElementsByTagName('div');
+    for (var i = 0; i < siblings.length; i++) {
+        siblings[i].className = siblings[i].className
+            .replace(/active/, '').replace(/\s\s*$/, '');
+    }
+    el.className += ' active';
+}
+
+function initMap() {
+
+    map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 4,
+        center: {
+            lat: 38.60514297178794,
+            lng: -101.88202700367933
+        },
+        fullscreenControl: false,
+        zoomControlOptions: {
+            position: google.maps.ControlPosition.LEFT_BOTTOM
+        },
+        streetViewControl: false
+    });
+
+    var bounds = new google.maps.LatLngBounds();
+
+    infowindow = new google.maps.InfoWindow();
+
+    // Show the information for a store when its marker is clicked.
+    markers = storeJson.map((store) => {
+        //var coordinatesStr = store.Coordinates.split(",");
+        const[lat, lng] = [store["Latitude"], store["Longitude"]]
+
+        var icon = {
+            url: greenPinIcon, // url
+            scaledSize: new google.maps.Size(25, 25), // scaled size
+
+        };
+var addressText = store["Address"] + ", " + store["State"] + ", " + store["Zip Code"] + ", " + store["Country"];
+        var marker = new google.maps.Marker({
+            icon: icon,
+            position: {
+                lat,
+                lng
+            },
+            map: map,
+			address: addressText,
+            name: store["Name"],
+            type: store["Brewery Type"],
+			website: store["Website"]
+			
+        });
+        /*	bounds.extend({
+        lat,
+        lng
+        }); */
+
+        availableBreweries.push(store["Name"]);
+
+        
+        marker.addListener("click", () => {
+            if (selectedmarker) {
+                selectedmarker.setIcon(greenPinIcon);
+            }
+            selectedmarker = marker;
+            marker.setIcon(redPinIcon)
+
+            infowindow.setContent(
+                "<b>" + store["Name"] + "</b> <br/><br/>" + addressText + "<br/><br/>" + store.Phone + "<br/><br/>" +
+                '<br/> <a target="_blank" href="https://' + store["Website"] + '">Website</a>' +
+                '<br/><a target="_blank" href="https://www.google.com/maps?saddr=' + addressText + '">Get Directions</a>');
+            //infowindow.setPosition({ lat, lng });
+
+            //infowindow.open(map, marker);
+            map.panTo(marker.getPosition());
+
+            document.getElementById("sidebar").style.display = "block";
+            $('#listingDiv').children().remove();
+            var listing = listings.appendChild(document.createElement('div'));
+            listing.className = 'item';
+
+            if (store["Brewery Type"] != 'null') {
+                var companyType = listing.appendChild(document.createElement('div'));
+                if (store["Brewery Type"] == "Brewpub") {
+                    companyType.className = "company-type brewpub";
+                } else {
+                    companyType.className = "company-type beer-bar";
+                }
+                companyType.innerHTML = store["Brewery Type"];
+
+            }
+
+            var link = listing.appendChild(document.createElement('a'));
+            link.href = '#';
+            link.className = 'title';
+            link.innerHTML = '<br/>' + store["Name"] + '<br>';
+
+            var itemLocationAddress = listing.appendChild(document.createElement('div'));
+            itemLocationAddress.className = "item-location";
+            itemLocationAddress.innerHTML += '<small class="quiet">' + addressText + '</small><br/>';
+
+            websiteDirectionBtns = document.createElement('div');
+            websiteDirectionBtns.className = "btn-wrapper-websitedirections";
+            if (store["Website"] != "null") {
+                var websiteBtn = websiteDirectionBtns.appendChild(document.createElement('a'));
+                websiteBtn.href = "https://" + store["Website"];
+                websiteBtn.target = "_blank";
+                websiteBtn.innerHTML = '<button type="button" class="btn btn-outline-info">Website</button>';
+            }
+            var getDirectionsBtn = websiteDirectionBtns.appendChild(document.createElement('a'));
+            getDirectionsBtn.href = "https://www.google.com/maps?saddr='" + addressText + "'";
+            getDirectionsBtn.target = "_blank";
+            getDirectionsBtn.innerHTML = '<button type="button" class="btn btn-outline-info">Directions</button>';
+
+            itemLocationAddress.appendChild(websiteDirectionBtns);
+
+            var ownershipDiv = listing.appendChild(document.createElement('div'));
+            ownershipDiv.className = "item-ownership-image";
+            ownershipImage = document.createElement('a');
+			ownershipImage.href = "https://www.3sd.club/chapters";
+					ownershipImage.target = "_blank";
+            ownershipImage.className = 'is-craft';
+            ownershipImage.innerHTML = '<img class="craft-seal" src="'+ beerBottleImage + '" alt="independent craft seal">'
+                
+                ownershipDiv.appendChild(ownershipImage)
+
+                var linkClick = 0;
+
+            link.onclick = function () {
+                linkClick = 1;
+                setActive(listing);
+
+                if (selectedmarker) {
+                    selectedmarker.setIcon(greenPinIcon);
+                }
+                selectedmarker = marker;
+                marker.setIcon(redPinIcon)
+                map.panTo(marker.getPosition());
+                map.setZoom(14)
+
+                return false;
+            };
+        });
+
+        return marker;
+    });
+    //map.fitBounds(bounds);
+    $("#tags").autocomplete({
+        source: availableBreweries,
+        minLength: 3,
+        select: function (e, ui) {
+
+            //console.log(ui.item.value);
+            searchBreweryCenter(ui.item.value);
+        }
+    });
+
+    var clusterStyle = [{
+            textColor: "#383A37",
+            url: smallIcon,
+            height: 30,
+            width: 30
+        }, {
+            textColor: "#383A37",
+            url: mediumIcon,
+            height: 40,
+            width: 40
+        }, {
+            textColor: "#383A37",
+            url: largeIcon,
+            height: 50,
+            width: 50
+        }
+    ];
+    var clusterOpt = {
+        gridSize: 60,
+        maxZoom: 16,
+        styles: clusterStyle
+    }
+
+    const markerCluster = new MarkerClusterer(
+            map,
+            markers,
+            clusterOpt);
+
+    
+}
+
+
+  
+  
+  </script>
+</body>
+
+</html>
